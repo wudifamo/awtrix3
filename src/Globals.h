@@ -83,6 +83,11 @@ extern String TIME_FORMAT;
 extern bool AUTO_BRIGHTNESS;
 extern bool AP_MODE;
 extern bool MATRIX_OFF;
+// 夜间模式（定时熄屏）：NIGHT_START / NIGHT_END 为一天中的分钟数 0-1439
+extern bool NIGHT_ACTIVE;
+extern int NIGHT_START;
+extern int NIGHT_END;
+extern bool NIGHT_STATE;
 extern uint32_t TEXTCOLOR_888;
 extern bool MIRROR_DISPLAY;
 extern bool AUTO_TRANSITION;

@@ -1,0 +1,13 @@
+# AWTRIX 3 ulanzi custom partition table
+# Based on the esp32dev default 4MB table: offsets and sizes of nvs / otadata / spiffs / coredump
+# are kept unchanged (spiffs stays at 0x290000 so LittleFS data - icons, custom apps,
+# DoNotTouch.json - is preserved). Only app0 is enlarged from 1.25MB to 1.75MB and app1 shrinks.
+# Note: with a smaller app1 the firmware OTA web update (/api/doupdate) no longer fits;
+# flash over USB / PlatformIO instead.
+# Name,     Type, SubType,  Offset,   Size,     Flags
+nvs,        data, nvs,      0x9000,   0x5000,
+otadata,    data, ota,      0xe000,   0x2000,
+app0,       app,  ota_0,    0x10000,  0x1C0000,
+app1,       app,  ota_1,    0x1D0000, 0x0C0000,
+spiffs,     data, spiffs,   0x290000, 0x160000,
+coredump,   data, coredump, 0x3F0000, 0x10000,

@@ -114,9 +114,49 @@ void setup()
   DisplayManager.setBrightness(BRIGHTNESS);
 }
 
+// ---------- 夜间模式（定时熄屏） ----------
+// 每个主循环检查一次当前时间是否处于夜间时段，仅在跨边界时切换屏幕电源，
+// 不打断时段内的手动开/屏操作（下次跨边界时自动恢复调度）。
+void nightModeTick()
+{
+  if (!NIGHT_ACTIVE)
+  {
+    if (NIGHT_STATE)
+    {
+      NIGHT_STATE = false;
+      DisplayManager.setPower(true);
+    }
+    return;
+  }
+
+  struct tm *t = timer_localtime();
+  if (t->tm_year < 120) // 时间尚未同步（仍停留在 1970），不处理
+    return;
+
+  int minuteOfDay = t->tm_hour * 60 + t->tm_min;
+  bool inNight;
+  if (NIGHT_START == NIGHT_END)
+    inNight = false; // 起止时间相同视为不启用
+  else if (NIGHT_START < NIGHT_END)
+    inNight = (minuteOfDay >= NIGHT_START && minuteOfDay < NIGHT_END);
+  else
+    inNight = (minuteOfDay >= NIGHT_START || minuteOfDay < NIGHT_END); // 跨午夜
+
+  if (inNight != NIGHT_STATE)
+  {
+    NIGHT_STATE = inNight;
+    DisplayManager.setPower(!inNight);
+    if (DEBUG_MODE)
+    {
+      DEBUG_PRINTF("NightMode: %s (%02d:%02d)", inNight ? "OFF" : "ON", t->tm_hour, t->tm_min);
+    }
+  }
+}
+
 void loop()
 {
   timer_tick();
+  nightModeTick();
   ServerManager.tick();
   DisplayManager.tick();
   PeripheryManager.tick();

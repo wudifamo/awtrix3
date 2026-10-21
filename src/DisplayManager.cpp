@@ -2020,7 +2020,7 @@ String getOverlayName()
 
 String DisplayManager_::getSettings()
 {
-  StaticJsonDocument<1024> doc;
+  StaticJsonDocument<2048> doc;
   doc["MATP"] = !MATRIX_OFF;
   doc["ABRI"] = AUTO_BRIGHTNESS;
   doc["BRI"] = BRIGHTNESS;
@@ -2061,6 +2061,9 @@ String DisplayManager_::getSettings()
   doc["BAT"] = SHOW_BAT;
   doc["VOL"] = SOUND_VOLUME;
   doc["OVERLAY"] = getOverlayName();
+  doc["NMON"] = NIGHT_ACTIVE;
+  doc["NMS"] = NIGHT_START;
+  doc["NME"] = NIGHT_END;
   String jsonString;
   return serializeJson(doc, jsonString), jsonString;
 }
@@ -2120,6 +2123,11 @@ void DisplayManager_::setNewSettings(const char *json)
   IS_CELSIUS = doc.containsKey("CEL") ? doc["CEL"] : IS_CELSIUS;
   START_ON_MONDAY = doc.containsKey("SOM") ? doc["SOM"].as<bool>() : START_ON_MONDAY;
   MATRIX_OFF = doc.containsKey("MATP") ? !doc["MATP"].as<bool>() : MATRIX_OFF;
+  NIGHT_ACTIVE = doc.containsKey("NMON") ? doc["NMON"].as<bool>() : NIGHT_ACTIVE;
+  if (doc.containsKey("NMS"))
+    NIGHT_START = constrain(doc["NMS"].as<int>(), 0, 1439);
+  if (doc.containsKey("NME"))
+    NIGHT_END = constrain(doc["NME"].as<int>(), 0, 1439);
   TIME_FORMAT = doc.containsKey("TFORMAT") ? doc["TFORMAT"].as<String>() : TIME_FORMAT;
   GAMMA = doc.containsKey("GAMMA") ? doc["GAMMA"].as<float>() : GAMMA;
   DATE_FORMAT = doc.containsKey("DFORMAT") ? doc["DFORMAT"].as<String>() : DATE_FORMAT;

@@ -285,6 +285,9 @@ void loadSettings()
     SHOW_HUM = Settings.getBool("HUM", true);
     MATRIX_LAYOUT = Settings.getUInt("MAT", 0);
     SCROLL_SPEED = Settings.getUInt("SSPEED", 100);
+    NIGHT_ACTIVE = Settings.getBool("NMON", false);
+    NIGHT_START = constrain(Settings.getUInt("NMS", 0), 0, 1439);
+    NIGHT_END = constrain(Settings.getUInt("NME", 420), 0, 1439);
 #ifdef ULANZI
     SHOW_BAT = Settings.getBool("BAT", true);
 #endif
@@ -337,6 +340,9 @@ void saveSettings()
 #ifdef ULANZI
     Settings.putBool("BAT", SHOW_BAT);
 #endif
+    Settings.putBool("NMON", NIGHT_ACTIVE);
+    Settings.putUInt("NMS", NIGHT_START);
+    Settings.putUInt("NME", NIGHT_END);
     Settings.putBool("SOUND", SOUND_ACTIVE);
     Settings.putUInt("VOL", SOUND_VOLUME);
     Settings.end();
@@ -411,6 +417,11 @@ bool AUTO_BRIGHTNESS = true;
 bool UPPERCASE_LETTERS = true;
 bool AP_MODE;
 bool MATRIX_OFF;
+// 夜间模式（定时熄屏）：NIGHT_START / NIGHT_END 为一天中的分钟数 0-1439，支持跨午夜
+bool NIGHT_ACTIVE = false;
+int NIGHT_START = 0;
+int NIGHT_END = 420;
+bool NIGHT_STATE = false;
 bool MIRROR_DISPLAY = false;
 uint32_t TEXTCOLOR_888 = 0xFFFFFF;
 bool SOUND_ACTIVE;

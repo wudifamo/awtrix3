@@ -247,7 +247,7 @@ void ServerManager_::setup()
         mws.addOptionBox("Auth");
         mws.addOption("Auth Username", AUTH_USER);
         mws.addOption("Auth Password", AUTH_PASS);
-        mws.addHandler("/save", HTTP_POST, saveHandler);
+        mws.addHandler("/save", HTTP_ANY, saveHandler);
         addHandler();
         udp.begin(localUdpPort);
         if (DEBUG_MODE)

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AWTRIX 控制台</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC",sans-serif;margin:0;background:#f2f3f7;color:#222}
+header{background:#d6001c;color:#fff;padding:14px 16px;font-size:18px;font-weight:600;position:sticky;top:0}
+.wrap{max-width:680px;margin:0 auto;padding:12px 12px 60px}
+.card{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+h2{margin:0 0 10px;font-size:15px;color:#555}
+label.row{display:flex;justify-content:space-between;align-items:center;margin:10px 0;font-size:14px}
+label.row span{color:#666}
+input[type=number],input[type=text]{width:110px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-size:14px}
+input[type=range]{width:150px}
+button{padding:8px 14px;border:0;border-radius:8px;background:#d6001c;color:#fff;font-size:14px;margin:4px 4px 0 0}
+button.ghost{background:#eee;color:#333}
+textarea{width:100%;height:130px;font-family:monospace;font-size:12px;border:1px solid #ddd;border-radius:8px;padding:8px}
+.stats{font-size:12px;color:#aaa;margin-top:4px}
+.val{color:#d6001c;font-weight:600}
+.sw{position:relative;width:48px;height:26px;flex:0 0 auto}
+.sw input{opacity:0;width:0;height:0}
+.sl{position:absolute;inset:0;background:#ccc;border-radius:26px;transition:.2s;cursor:pointer}
+.sl:before{content:"";position:absolute;width:22px;height:22px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s}
+.sw input:checked + .sl{background:#d6001c}
+.sw input:checked + .sl:before{transform:translateX(22px)}
+select{padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin:0 2px}
+.note{font-size:12px;color:#999;margin-top:8px;line-height:1.5}
+</style>
+</head>
+<body>
+<header>AWTRIX 控制台</header>
+<div class="wrap">
+
+<div class="card">
+  <h2>设备状态</h2>
+  <div id="stats">—</div>
+  <button class="ghost" onclick="loadStats()">刷新状态</button>
+</div>
+
+<div class="card">
+  <h2>显示</h2>
+  <label class="row"><span>亮度 BRI (0-255)</span><span><input type="number" id="BRI" min="0" max="255" style="width:80px"></span></label>
+  <label class="row"><span>自动亮度 ABRI</span><input type="checkbox" id="ABRI"></label>
+  <label class="row"><span>全局大写 UPPERCASE</span><input type="checkbox" id="UPPERCASE"></label>
+  <label class="row"><span>屏幕开关 MATP</span><input type="checkbox" id="MATP"></label>
+</div>
+
+<div class="card">
+  <h2>轮播</h2>
+  <label class="row"><span>自动翻页 ATRANS</span><input type="checkbox" id="ATRANS"></label>
+  <label class="row"><span>每页停留 ATIME(秒)</span><input type="number" id="ATIME"></label>
+  <label class="row"><span>切换效果 TEFF(0-10)</span><input type="number" id="TEFF"></label>
+  <label class="row"><span>切换动画 TSPEED(ms)</span><input type="number" id="TSPEED"></label>
+  <label class="row"><span>滚动速率 SSPEED(%)</span><input type="number" id="SSPEED"></label>
+  <button onclick="save()">保存设置</button>
+</div>
+
+<div class="card">
+  <h2>内置应用开关</h2>
+  <label class="row"><span>时间 Time</span><input type="checkbox" id="TIM"></label>
+  <label class="row"><span>日期 Date</span><input type="checkbox" id="DAT"></label>
+  <label class="row"><span>温度 Temperature</span><input type="checkbox" id="TEMP"></label>
+  <label class="row"><span>湿度 Humidity</span><input type="checkbox" id="HUM"></label>
+  <label class="row"><span>电量 Battery</span><input type="checkbox" id="BAT"></label>
+</div>
+
+<div class="card">
+  <h2>夜间模式（到点自动熄屏）</h2>
+  <label class="row"><span>夜间模式</span><span class="sw"><input type="checkbox" id="nmOn"><span class="sl"></span></span></label>
+  <label class="row"><span>开始</span><span><select id="nmSH"></select> 时 <select id="nmSM"></select> 分</span></label>
+  <label class="row"><span>结束</span><span><select id="nmEH"></select> 时 <select id="nmEM"></select> 分</span></label>
+  <div class="note" id="nmStatus">—</div>
+  <div class="note">由固件定时执行，无需保持本页面打开；配置保存在时钟内，重启后仍生效；支持跨午夜时段（如 22:00 ~ 7:00）。</div>
+</div>
+
+<div class="card">
+  <h2>自定义 App（推送到轮播）</h2>
+  <label class="row"><span>名称</span><input type="text" id="cname" value="mydata"></label>
+  <label class="row"><span>文本</span><input type="text" id="ctext" style="width:180px"></label>
+  <label class="row"><span>图标ID</span><input type="text" id="cicon"></label>
+  <label class="row"><span>颜色</span><input type="color" id="ccolor" value="#00c853" style="width:60px;height:32px;border:0"></label>
+  <label class="row"><span>时长(秒)</span><input type="number" id="cdur" value="10"></label>
+  <label class="row"><span>重启保留 save</span><input type="checkbox" id="csave"></label>
+  <button onclick="pushCustom()">推送</button>
+  <button class="ghost" onclick="delCustom()">删除</button>
+</div>
+
+<div class="card">
+  <h2>通知（临时弹出）</h2>
+  <label class="row"><span>文本</span><input type="text" id="ntext" style="width:180px"></label>
+  <label class="row"><span>时长(秒)</span><input type="number" id="ndur" value="10"></label>
+  <label class="row"><span>常驻 hold</span><input type="checkbox" id="nhold"></label>
+  <button onclick="notify()">发送</button>
+  <button class="ghost" onclick="post('notify/dismiss')">关闭通知</button>
+</div>
+
+<div class="card">
+  <h2>快捷操作</h2>
+  <button class="ghost" onclick="post('previousapp')">上一个</button>
+  <button class="ghost" onclick="post('nextapp')">下一个</button>
+  <button class="ghost" onclick="switchApp('Time')">回到时钟</button>
+  <button class="ghost" onclick="if(confirm('确定重启时钟？'))post('reboot')">重启</button>
+</div>
+
+<div class="card">
+  <h2>原始设置 JSON（时区 / 日期格式等键名以实际返回为准）</h2>
+  <textarea id="raw"></textarea>
+  <button class="ghost" onclick="load()">重新读取</button>
+  <button onclick="applyRaw()">应用 JSON</button>
+</div>
+
+</div>
+<script>
+const KEYS=["BRI","ABRI","UPPERCASE","MATP","ATRANS","ATIME","TEFF","TSPEED","SSPEED","TIM","DAT","TEMP","HUM","BAT"];
+
+async function api(path, method="GET", body){
+  const opt = {method, headers:{"Content-Type":"application/json"}};
+  if(body !== undefined) opt.body = JSON.stringify(body);
+  const r = await fetch("/api/" + path, opt);
+  const t = await r.text();
+  try { return JSON.parse(t); } catch(e){ return t; }
+}
+function post(path, body){ return api(path, "POST", body); }
+
+async function load(){
+  const s = await api("settings");
+  KEYS.forEach(k=>{
+    const el = document.getElementById(k); if(!el) return;
+    if(el.type==="checkbox") el.checked = !!s[k];
+    else el.value = s[k] ?? "";
+  });
+  document.getElementById("raw").value = JSON.stringify(s, null, 2);
+}
+
+async function save(){
+  const body = {};
+  KEYS.forEach(k=>{
+    const el = document.getElementById(k); if(!el) return;
+    body[k] = el.type==="checkbox" ? el.checked : Number(el.value);
+  });
+  await post("settings", body);
+  alert("已保存（应用开关等部分设置需重启生效）");
+  load();
+}
+
+async function pushCustom(){
+  const p = {text:ctext.value, color:ccolor.value, duration:Number(cdur.value)||10, save:csave.checked};
+  if(cicon.value.trim()) p.icon = cicon.value.trim();
+  await fetch(`/api/custom?name=${encodeURIComponent(cname.value||"custom")}`, {
+    method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(p)
+  });
+}
+async function delCustom(){
+  await fetch(`/api/custom?name=${encodeURIComponent(cname.value||"custom")}`, {
+    method:"POST", headers:{"Content-Type":"application/json"}, body:"{}"
+  });
+}
+async function notify(){
+  await post("notify", {text:ntext.value, duration:Number(ndur.value)||10, hold:nhold.checked});
+}
+async function switchApp(name){ await post("switch", {name}); }
+async function applyRaw(){
+  await post("settings", JSON.parse(raw.value));
+  alert("已应用");
+  load();
+}
+async function loadStats(){
+  const s = await api("stats");
+  const rows = Object.entries(s).map(([k,v])=>`<div>${k}: <b class="val">${v}</b></div>`).join("");
+  document.getElementById("stats").innerHTML = rows || "无数据";
+}
+// ===== 夜间模式（固件端调度，配置写入时钟 NVS） =====
+function fillSel(id, max){
+  const el = document.getElementById(id);
+  for(let i = 0; i <= max; i++){
+    const o = document.createElement("option");
+    o.value = i;
+    o.textContent = String(i).padStart(2, "0");
+    el.appendChild(o);
+  }
+}
+fillSel("nmSH", 23); fillSel("nmEH", 23); fillSel("nmSM", 59); fillSel("nmEM", 59);
+const nmPad = v => String(v ?? 0).padStart(2, "0");
+
+function nmRender(sh, sm, eh, em, on){
+  document.getElementById("nmStatus").textContent = on
+    ? `已启用｜时段 ${nmPad(sh)}:${nmPad(sm)} ~ ${nmPad(eh)}:${nmPad(em)}｜由固件定时执行，无需保持本页面打开`
+    : "夜间模式已关闭";
+}
+async function nmLoad(){
+  const s = await api("settings");
+  const nms = s.NMS ?? 0, nme = s.NME ?? 420;
+  const sh = Math.floor(nms / 60), sm = nms % 60;
+  const eh = Math.floor(nme / 60), em = nme % 60;
+  nmOn.checked = !!s.NMON;
+  nmSH.value = sh; nmSM.value = sm; nmEH.value = eh; nmEM.value = em;
+  nmRender(sh, sm, eh, em, !!s.NMON);
+}
+async function nmSave(){
+  await post("settings", {
+    NMON: nmOn.checked,
+    NMS: (+nmSH.value) * 60 + (+nmSM.value),
+    NME: (+nmEH.value) * 60 + (+nmEM.value)
+  });
+  nmLoad();
+}
+["nmOn","nmSH","nmSM","nmEH","nmEM"].forEach(id => {
+  document.getElementById(id).addEventListener("change", nmSave);
+});
+nmLoad();
+
+load();
+</script>
+</body>
+</html>
