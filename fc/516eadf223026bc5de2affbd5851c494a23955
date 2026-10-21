@@ -1,0 +1,40 @@
+partitions_ulanzi_4mb.csv
+  s_46dbe0cab7e9d0::t_d4dd2af37ab98f 1-6
+  s_46dbe0cab7e9d0::t_06eb499d6df4ab 7-13
+platformio.ini
+  s_46dbe0cab7e9d0::t_48b048d385e13f 38-39
+  s_46dbe0cab7e9d0::t_a66cd1830ceaef 23
+src/DisplayManager.cpp
+  s_46dbe0cab7e9d0::t_fbe740772a732a 2023
+  s_46dbe0cab7e9d0::t_64727f32024bf7 2064-2066
+  s_46dbe0cab7e9d0::t_47d19d2826aa0e 2126-2130
+src/ServerManager.cpp
+  s_46dbe0cab7e9d0::t_69d19e5e584602 250
+src/Globals.cpp
+  s_46dbe0cab7e9d0::t_43f5510d86ff8a 420-424
+  s_46dbe0cab7e9d0::t_7e1bc57e5c6025 288-290
+  s_46dbe0cab7e9d0::t_8cfe1dec013c0a 343-345
+src/Globals.h
+  s_46dbe0cab7e9d0::t_3e817c8a783b2e 86-90
+awtrix-ui.html
+  s_46dbe0cab7e9d0::t_16999dd3b7de93 1-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.32",
+  "base_commit_sha": "fc516eadf223026bc5de2affbd5851c494a23955",
+  "prompts": {},
+  "sessions": {
+    "s_46dbe0cab7e9d0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "6b6981dfc94d4bc2a52da200a0e26d18",
+        "model": "step-5-preview"
+      },
+      "human_author": "kangzhenqi <kangzhenqi@sdpjw.com>",
+      "custom_attributes": {
+        "internal_commit_event_allowlist": "codeup.aliyun.com,codeup-*,key_*"
+      }
+    }
+  }
+}
